@@ -29,7 +29,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
-import { useUserStore } from '../userStore';
+import { useUserStore } from '../user-store';
 const userStore = useUserStore();
 
 const playerNameInput = ref('');
