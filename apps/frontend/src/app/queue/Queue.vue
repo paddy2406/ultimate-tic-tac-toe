@@ -29,11 +29,9 @@ onUnmounted(() => {
 
 watch(
   () => queueStore.matchId,
-  (newValue, oldValue) => {
-    console.log(`Count changed from ${oldValue} to ${newValue}`);
-
+  (newValue) => {
     setTimeout(() => {
-      router.push({ name: 'Game', params: { id: newValue } });
+      router.push({ name: 'Game', params: { gameId: newValue } });
     }, 5000);
   }
 );

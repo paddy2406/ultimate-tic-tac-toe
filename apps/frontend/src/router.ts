@@ -6,7 +6,7 @@ import Game from './app/game/Game.vue';
 const routes = [
   { path: '/', name: 'Home', component: Home },
   { path: '/queue', name: 'Queue', component: Queue },
-  { path: '/game/:id', name: 'Game', component: Game },
+  { path: '/game/:gameId', name: 'Game', component: Game },
 ];
 
 const router = createRouter({
