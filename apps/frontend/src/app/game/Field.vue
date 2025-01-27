@@ -1,5 +1,8 @@
 <script setup lang="ts">
 import { defineProps } from 'vue';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { faX } from '@fortawesome/free-solid-svg-icons';
+import { faCircle } from '@fortawesome/free-regular-svg-icons';
 
 defineProps<{
   fieldData: number[];
@@ -20,15 +23,32 @@ defineEmits<{
       :style="{ pointerEvents: state === 0 ? 'auto' : 'none' }"
       class="cell"
     >
-      {{ state }}
+      <FontAwesomeIcon
+        v-if="state === 1"
+        :icon="faX"
+        style="line-height: 1; font-size: 24px"
+      />
+
+      <FontAwesomeIcon
+        v-else-if="state === 2"
+        :icon="faCircle"
+        style="line-height: 1; font-size: 24px"
+      />
     </div>
   </div>
 </template>
 
 <style scoped>
+svg {
+  width: 80%;
+  height: 80%;
+}
+
 .tic-tac-toe {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  aspect-ratio: 1 / 1;
 }
 .row {
   display: flex;
@@ -38,10 +58,8 @@ defineEmits<{
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 24px;
   cursor: pointer;
-  width: 100%;
-  height: 100%;
   background-color: lightblue;
+  aspect-ratio: 1 / 1;
 }
 </style>

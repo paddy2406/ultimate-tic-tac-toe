@@ -48,7 +48,7 @@ export const useGameStore = defineStore('gameStore', {
         this.currentField = res.field;
         this.turnDuration = res.turnDuration;
         this.board[res.field][res.square] =
-          res.turn === playerId ? FieldState.Own : FieldState.Opponent;
+          res.turn === playerId ? FieldState.Opponent : FieldState.Own;
       });
 
       eventSource.addEventListener('turnTimeout', (event) => {

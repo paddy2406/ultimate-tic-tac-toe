@@ -116,19 +116,9 @@ function move(field: number, square: number) {
   grid-template-rows: repeat(3, 1fr);
   grid-template-columns: repeat(3, 1fr);
   gap: 5px;
-  width: 100%;
-
   aspect-ratio: 1 / 1;
 }
 .row {
   display: contents;
-}
-.cell {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid #000;
-  width: 100px;
-  height: 100px;
 }
 </style>
