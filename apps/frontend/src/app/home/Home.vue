@@ -22,7 +22,9 @@
     <div v-else>
       <h1>Hello {{ userStore.name }}</h1>
       <label> Press button to join matchmaking queue</label>
-      <button @click="$router.push('/queue')">Go!</button>
+      <button>
+        <RouterLink to="/queue">Go!</RouterLink>
+      </button>
     </div>
   </div>
 </template>

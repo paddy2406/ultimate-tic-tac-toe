@@ -9,11 +9,12 @@ let interval: any;
 
 const userStore = useUserStore();
 const queueStore = useQueueStore();
+const router = useRouter();
 
 onMounted(() => {
   const userId = userStore.id;
   if (!userId) {
-    useRouter().push('/home');
+    router.push({ name: 'Home' });
     return;
   }
   queueStore.joinQueue(userId, userStore.name);
@@ -32,7 +33,7 @@ watch(
     console.log(`Count changed from ${oldValue} to ${newValue}`);
 
     setTimeout(() => {
-      useRouter().push(`/game/${newValue}`);
+      router.push({ name: 'Game', params: { id: newValue } });
     }, 5000);
   }
 );
@@ -55,7 +56,7 @@ watch(
   <div v-else>
     <h1>Match found!</h1>
     <i class="spinner"></i>
-    <p>Joining...</p>
+    <p>Joining Game against {{ queueStore.oppenent }}</p>
   </div>
 </template>
 

@@ -4,9 +4,9 @@ import Queue from './app/queue/Queue.vue';
 import Game from './app/game/Game.vue';
 
 const routes = [
-  { path: '/', component: Home },
-  { path: '/queue', component: Queue },
-  { path: '/game', component: Game },
+  { path: '/', name: 'Home', component: Home },
+  { path: '/queue', name: 'Queue', component: Queue },
+  { path: '/game/:id', name: 'Game', component: Game },
 ];
 
 const router = createRouter({
