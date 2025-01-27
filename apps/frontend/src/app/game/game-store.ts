@@ -11,7 +11,7 @@ let eventSource: EventSource | undefined;
 
 export const useGameStore = defineStore('gameStore', {
   state: () => ({
-    playingField: [
+    board: [
       Array(9).fill(0),
       Array(9).fill(0),
       Array(9).fill(0),
@@ -23,8 +23,8 @@ export const useGameStore = defineStore('gameStore', {
       Array(9).fill(0),
     ],
     opponent: '',
-    isOwnTurn: false,
-    turnUntil: 0,
+    isOwnTurn: undefined as boolean | undefined,
+    turnDuration: 0,
     currentField: -1,
     won: undefined as boolean | undefined,
   }),
@@ -39,22 +39,22 @@ export const useGameStore = defineStore('gameStore', {
         console.log(res);
         this.opponent = res.opponent;
         this.isOwnTurn = res.turn === playerId;
-        this.turnUntil = Date.now() + res.turnDuration;
+        this.turnDuration = res.turnDuration;
       });
 
       eventSource.addEventListener('move', (event) => {
         const res = JSON.parse(event.data);
         this.isOwnTurn = res.turn === playerId;
         this.currentField = res.field;
-        this.turnUntil = Date.now() + res.turnDuration;
-        this.playingField[res.field][res.square] =
+        this.turnDuration = res.turnDuration;
+        this.board[res.field][res.square] =
           res.turn === playerId ? FieldState.Own : FieldState.Opponent;
       });
 
       eventSource.addEventListener('turnTimeout', (event) => {
         const res = JSON.parse(event.data);
         this.isOwnTurn = res.turn === playerId;
-        this.turnUntil = Date.now() + res.turnDuration;
+        this.turnDuration = res.turnDuration;
         this.currentField = res.field;
       });
 
@@ -70,10 +70,10 @@ export const useGameStore = defineStore('gameStore', {
       field: number,
       square: number
     ) {
-      const res = await axios.post(
-        `/api/game/move?gameId=${gameId}&playerId=${playerId}`,
-        { field, square }
-      );
+      await axios.post(`/api/game/move?gameId=${gameId}&playerId=${playerId}`, {
+        field,
+        square,
+      });
     },
   },
 });

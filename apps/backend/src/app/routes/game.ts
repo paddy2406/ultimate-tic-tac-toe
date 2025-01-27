@@ -1,5 +1,6 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import { GameService } from '../services/game-service';
+import { moveSchema, move } from '@ultimate-tic-tac-toe/types';
 
 export default async function (fastify: FastifyInstance) {
   fastify.get(
@@ -24,6 +25,25 @@ export default async function (fastify: FastifyInstance) {
       request.socket.on('close', () => {
         GameService.disconnect(request.query.gameId, request.query.playerId);
       });
+    }
+  );
+
+  fastify.post(
+    '/game/move',
+    { schema: moveSchema },
+    async function (
+      request: FastifyRequest<{
+        Body: move;
+        Querystring: { gameId?: string; playerId?: string };
+      }>
+    ) {
+      GameService.move(
+        request.query.gameId,
+        request.query.playerId,
+        request.body.field,
+        request.body.square
+      );
+      return {};
     }
   );
 }

@@ -32,7 +32,7 @@ watch(
   (newValue) => {
     setTimeout(() => {
       router.push({ name: 'Game', params: { gameId: newValue } });
-    }, 5000);
+    }, 1000);
   }
 );
 </script>

@@ -4,7 +4,7 @@ import {
   registerResponse,
   registerSchema,
 } from '@ultimate-tic-tac-toe/types';
-import { nanoid } from 'nanoid';
+import { UserService } from '../services/user-service';
 
 export default async function (fastify: FastifyInstance) {
   fastify.post(
@@ -13,8 +13,7 @@ export default async function (fastify: FastifyInstance) {
     async function (
       data: FastifyRequest<{ Body: register }>
     ): Promise<registerResponse> {
-      console.log('login', data.body);
-      return { name: data.body.name, id: nanoid() };
+      return UserService.register(data.body.name);
     }
   );
 }
