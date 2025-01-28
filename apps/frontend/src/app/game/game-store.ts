@@ -45,7 +45,7 @@ export const useGameStore = defineStore('gameStore', {
       eventSource.addEventListener('move', (event) => {
         const res = JSON.parse(event.data);
         this.isOwnTurn = res.turn === playerId;
-        this.currentField = res.field;
+        this.currentField = res.currentField;
         this.turnDuration = res.turnDuration;
         this.board[res.field][res.square] =
           res.turn === playerId ? FieldState.Opponent : FieldState.Own;
@@ -61,7 +61,7 @@ export const useGameStore = defineStore('gameStore', {
       eventSource.addEventListener('matchOver', (event) => {
         const res = JSON.parse(event.data);
         this.won = res.winner === playerId;
-        eventSource?.close();
+        //eventSource?.close();
       });
     },
     async makeMove(

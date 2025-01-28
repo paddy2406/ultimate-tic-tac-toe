@@ -48,7 +48,11 @@ function move(field: number, square: number) {
 
       <div class="board">
         <div v-for="(field, index) in gameStore.board" :key="index" class="row">
-          <Field :field-data="field" :field-index="index" @makeMove="move" />
+          <Field
+            :field-data="field"
+            :field-index="index"
+            @makeMove="move"
+          />
         </div>
       </div>
       <div class="progress-box">

@@ -1,40 +1,95 @@
 <script setup lang="ts">
-import { defineProps } from 'vue';
+import { computed, defineProps } from 'vue';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { faX } from '@fortawesome/free-solid-svg-icons';
 import { faCircle } from '@fortawesome/free-regular-svg-icons';
+import { useGameStore } from './game-store';
 
-defineProps<{
+const gameStore = useGameStore();
+
+const props = defineProps<{
   fieldData: number[];
   fieldIndex: number;
 }>();
 
+const winner = computed(() => {
+  return checkSingleField(props.fieldData);
+});
+
 defineEmits<{
   makeMove: [number, number];
 }>();
+
+function checkSingleField(field: number[]): 'empty' | 'X' | 'O' | 'tie' {
+  const winCombinations = [
+    [0, 1, 2],
+    [3, 4, 5],
+    [6, 7, 8],
+    [0, 3, 6],
+    [1, 4, 7],
+    [2, 5, 8],
+    [0, 4, 8],
+    [2, 4, 6],
+  ];
+
+  for (const [a, b, c] of winCombinations) {
+    if (field[a] === field[b] && field[b] === field[c] && field[a] !== 0) {
+      return field[a] === 1 ? 'X' : 'O';
+    }
+  }
+  if (field.some((x) => x === 0)) {
+    return 'empty';
+  }
+  return 'tie';
+}
+
+const backgroundcolor = computed(() => {
+  if (
+    gameStore.currentField === -1 ||
+    props.fieldIndex === gameStore.currentField
+  ) {
+    return gameStore.isOwnTurn ? 'lightgreen' : 'lightcoral';
+  }
+  return 'lightblue';
+});
 </script>
 
 <template>
-  <div class="tic-tac-toe">
-    <div
-      v-for="(state, squareIndex) in fieldData"
-      :key="squareIndex"
-      @click="$emit('makeMove', fieldIndex, squareIndex)"
-      :style="{ pointerEvents: state === 0 ? 'auto' : 'none' }"
-      class="cell"
-    >
-      <FontAwesomeIcon
-        v-if="state === 1"
-        :icon="faX"
-        style="line-height: 1; font-size: 24px"
-      />
+  <div>
+    <div v-if="winner === 'empty'" class="tic-tac-toe">
+      <div
+        v-for="(state, squareIndex) in fieldData"
+        :key="squareIndex"
+        @click="$emit('makeMove', fieldIndex, squareIndex)"
+        :style="{
+          pointerEvents: state === 0 ? 'auto' : 'none',
+          backgroundColor: backgroundcolor,
+        }"
+        class="cell"
+      >
+        <FontAwesomeIcon
+          v-if="state === 1"
+          :icon="faX"
+          style="line-height: 1; font-size: 24px"
+        />
 
+        <FontAwesomeIcon
+          v-else-if="state === 2"
+          :icon="faCircle"
+          style="line-height: 1; font-size: 24px"
+        />
+      </div>
+    </div>
+    <div v-else-if="winner === 'X'" class="cell">
+      <FontAwesomeIcon :icon="faX" style="line-height: 1; font-size: 24px" />
+    </div>
+    <div v-else-if="winner === 'O'" class="cell">
       <FontAwesomeIcon
-        v-else-if="state === 2"
         :icon="faCircle"
         style="line-height: 1; font-size: 24px"
       />
     </div>
+    <div v-else class="cell">{{ 'peter' }}</div>
   </div>
 </template>
 
@@ -59,7 +114,6 @@ svg {
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  background-color: lightblue;
   aspect-ratio: 1 / 1;
 }
 </style>

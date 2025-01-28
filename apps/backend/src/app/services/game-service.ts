@@ -114,6 +114,12 @@ function move(gameId: string, playerId: string, field: number, square: number) {
   }
   if (game.currentField !== -1 && game.currentField !== field) {
     //throw new Error('Invalid move');
+    console.log(
+      'invalid move. current field:' +
+        game.currentField +
+        ':  targeted field:' +
+        field
+    );
     return;
   }
   if (game.board[field][square] !== 0) {
@@ -124,7 +130,6 @@ function move(gameId: string, playerId: string, field: number, square: number) {
   game.board[field][square] = playerId === game.players[0].id ? 1 : 2;
   game.currentField =
     checkSingleField(game.board[square]) === FieldState.Empty ? square : -1;
-
   const outcome = checkWin(game.board);
 
   if (outcome !== FieldState.Empty) {
@@ -151,6 +156,7 @@ function move(gameId: string, playerId: string, field: number, square: number) {
       JSON.stringify({
         field,
         square,
+        currentField: game.currentField,
         turn: game.currentPlayer,
         turnDuration: TURN_DURATION,
       })
@@ -162,7 +168,7 @@ function otherPlayer(players: [Player, Player?], playerId: string) {
   return players[0].id === playerId ? players[1].id : players[0].id;
 }
 
-function checkWin(board: number[][]) {
+function checkWin(board: number[][]): FieldState {
   const boardWithEachFieldCalculated = board.map((row) =>
     checkSingleField(row)
   );
@@ -183,19 +189,23 @@ function checkSingleField(field: FieldState[]): FieldState {
 
   for (const [a, b, c] of winCombinations) {
     if (
-      (field[a] === field[b] &&
-        field[b] === field[c] &&
-        field[a] !== FieldState.Empty,
-      field[a] !== FieldState.Tied)
+      field[a] === field[b] &&
+      field[b] === field[c] &&
+      field[a] !== FieldState.Empty &&
+      field[a] !== FieldState.Tied
     ) {
       return field[a];
     }
   }
-
-  return FieldState.Empty;
+  console.log('ping');
+  if (field.some((x) => x === FieldState.Empty)) {
+    return FieldState.Empty;
+  }
+  return FieldState.Tied;
 }
 
 function disconnect(gameId: string, playerId: string) {
+  console.log('disconnect');
   const game = gameMap.get(gameId);
   if (!game) {
     //throw new Error('Game not found');
