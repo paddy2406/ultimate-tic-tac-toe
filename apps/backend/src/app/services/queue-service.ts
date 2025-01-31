@@ -12,12 +12,6 @@ const queueMap = new Map<string, QueueMember>();
  * Matchmaker
  */
 setInterval(() => {
-  for (const [key, value] of queueMap) {
-    if (Date.now() - value.inQueueSince > 30_000) {
-      value.cb('timeout', '');
-      queueMap.delete(key);
-    }
-  }
   const playeralligableForMatch = Array.from(queueMap.entries()).filter(
     ([_, value]) => {
       return Date.now() - value.inQueueSince > 5_000;
@@ -39,6 +33,11 @@ setInterval(() => {
     );
     queueMap.delete(firstPlayerId);
     queueMap.delete(secondPlayerId);
+
+    for (const otherPlayer of queueMap.values()) {
+      otherPlayer.cb('deletePlayer', JSON.stringify({ firstPlayerId }));
+      otherPlayer.cb('deletePlayer', JSON.stringify({ secondPlayerId }));
+    }
   }
 }, 1000);
 

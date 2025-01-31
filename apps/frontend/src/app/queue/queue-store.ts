@@ -28,7 +28,9 @@ export const useQueueStore = defineStore('queuestore', {
 
       eventSource.addEventListener('deletePlayer', (event) => {
         const id = JSON.parse(event.data).id;
-        this.playersInQueue = this.playersInQueue.filter((x) => x.id !== id);
+        const index = this.playersInQueue.findIndex((x) => x.id === id);
+        this.playersInQueue.splice(index, 1);
+        console.log(this.playersInQueue);
         console.log('remove', event.data);
       });
 

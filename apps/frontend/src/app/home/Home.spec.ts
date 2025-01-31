@@ -1,9 +1,9 @@
 import { mount } from '@vue/test-utils';
-import Home from './home.vue';
+import Game from './Game.vue';
 
 describe('Home', () => {
   it('renders properly', () => {
-    const wrapper = mount(Home, {});
+    const wrapper = mount(Game, {});
     expect(wrapper.text()).toContain('Welcome to Home');
   });
 });

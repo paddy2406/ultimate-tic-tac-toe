@@ -21,7 +21,7 @@ onUnmounted(() => {
 });
 
 const progress = ref(0);
-let progressInterval;
+let progressInterval: number | undefined;
 
 watch(
   () => gameStore.isOwnTurn,
@@ -56,7 +56,7 @@ function modalClosed() {
 
   <div class="board">
     <div v-for="(field, index) in gameStore.board" :key="index" class="row">
-      <Field :field-data="field" :field-index="index" @makeMove="move" />
+      <Field :field-data="field" :field-index="index" @make-move="move" />
     </div>
   </div>
   <div class="progress-box">
@@ -67,20 +67,20 @@ function modalClosed() {
           width: progress + '%',
           backgroundColor: gameStore.isOwnTurn ? 'green' : 'red',
         }"
-      ></div>
+      />
     </div>
 
     {{ gameStore.isOwnTurn ? 'Your Turn' : gameStore.opponent + "'s turn" }}
   </div>
 
-  <Modal :isVisible="gameStore.gameOverMessage !== ''" @close="modalClosed">
+  <Modal :is-visible="gameStore.gameOverMessage !== ''" @close="modalClosed">
     <div class="gameOverMessage">{{ gameStore.gameOverMessage }}</div></Modal
   >
 </template>
 
 <style scoped>
 .gameOverMessage {
-  font-size: 13vmin;
+  font-size: 8vmin;
 }
 .header {
   margin-bottom: 20px;

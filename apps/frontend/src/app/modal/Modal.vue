@@ -1,3 +1,13 @@
+<script setup lang="ts">
+defineProps<{
+  isVisible: boolean;
+}>();
+
+defineEmits<{
+  close: void;
+}>();
+</script>
+
 <template>
   <transition>
     <div class="modal" v-if="isVisible">
@@ -11,16 +21,6 @@
     </div>
   </transition>
 </template>
-
-<script setup lang="ts">
-defineProps<{
-  isVisible: boolean;
-}>();
-
-defineEmits<{
-  close: void;
-}>();
-</script>
 
 <style scoped>
 .modal {

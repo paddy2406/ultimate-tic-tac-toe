@@ -37,7 +37,6 @@ export const useGameStore = defineStore('gameStore', {
 
       eventSource.addEventListener('gameStarted', (event) => {
         const res = JSON.parse(event.data);
-        console.log(res);
         this.opponent = res.opponent;
         this.isOwnTurn = res.turn === playerId;
         this.turnDuration = res.turnDuration;
@@ -72,7 +71,8 @@ export const useGameStore = defineStore('gameStore', {
       });
 
       eventSource.addEventListener('opponentDisconnect', () => {
-        this.gameOverMessage = 'your oppenent disconnected, YOU WIN';
+        this.won = true;
+        this.gameOverMessage = 'Your oppenent disconnected, YOU WIN';
       });
     },
     async makeMove(

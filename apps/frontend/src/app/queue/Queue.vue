@@ -56,7 +56,7 @@ watch(
     </div>
     <div v-else>
       <h1>MATCH FOUND!</h1>
-      <p>JOINING MATCH AGAINST {{ queueStore.oppenent }}</p>
+      <p>joining match against {{ queueStore.oppenent }}</p>
     </div>
   </div>
 </template>

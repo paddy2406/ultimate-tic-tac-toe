@@ -60,12 +60,12 @@ const backgroundcolor = computed(() => {
       <div
         v-for="(state, squareIndex) in fieldData"
         :key="squareIndex"
-        @click="$emit('makeMove', fieldIndex, squareIndex)"
         :style="{
           pointerEvents: state === 0 ? 'auto' : 'none',
           backgroundColor: backgroundcolor,
         }"
         class="cell"
+        @click="$emit('makeMove', fieldIndex, squareIndex)"
       >
         <FontAwesomeIcon
           v-if="state === 1"
@@ -105,11 +105,9 @@ svg {
   grid-template-rows: repeat(3, 1fr);
   aspect-ratio: 1 / 1;
 }
-.row {
-  display: flex;
-}
+
 .cell {
-  border: 1px solid black;
+  border: 2px solid rgba(0, 0, 0, 0.395);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -119,10 +117,10 @@ svg {
 }
 .completed {
   pointer-events: none;
-  filter: brightness(80%);
 }
 
-.cell:hover {
+.cell:hover,
+.completed {
   filter: brightness(80%);
 }
 </style>

@@ -11,8 +11,7 @@ export default async function (fastify: FastifyInstance) {
     ): Promise<loginResponse> {
       const user = UserService.getUser(data.body.id);
       if (!user) {
-        //throw new Error('User not found');
-        return;
+        throw new Error('User not found');
       }
       return { name: user.name, id: user.id };
     }

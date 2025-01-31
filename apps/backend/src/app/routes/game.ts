@@ -23,7 +23,7 @@ export default async function (fastify: FastifyInstance) {
       );
 
       request.socket.on('close', () => {
-        GameService.disconnect(request.query.gameId);
+        GameService.disconnect(request.query.gameId, request.query.playerId);
       });
     }
   );

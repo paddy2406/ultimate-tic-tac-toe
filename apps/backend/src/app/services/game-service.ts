@@ -28,7 +28,7 @@ setInterval(() => {
   for (const game of gameMap.values()) {
     if (Date.now() - game.lastTurn > TURN_DURATION) {
       game.currentField = -1;
-      game.currentPlayer = otherPlayer(game.players, game.currentPlayer);
+      game.currentPlayer = otherPlayer(game.players, game.currentPlayer).id;
       game.lastTurn = Date.now();
       game.players.forEach((player) => {
         player.cb(
@@ -55,7 +55,7 @@ function joinGame(
   }
   const game = gameMap.get(gameId);
   if (game.players[1]) {
-    //throw new Error('Game already full');
+    throw new Error('Game already full');
     return;
   }
 
@@ -70,7 +70,7 @@ function joinGame(
     player.cb(
       'gameStarted',
       JSON.stringify({
-        opponent: UserService.getUser(otherPlayer(game.players, player.id))
+        opponent: UserService.getUser(otherPlayer(game.players, player.id).id)
           .name,
         turn: game.players[0].id,
         turnDuration: TURN_DURATION,
@@ -112,22 +112,13 @@ function initGame(
 function move(gameId: string, playerId: string, field: number, square: number) {
   const game = gameMap.get(gameId);
   if (game.currentPlayer !== playerId) {
-    //throw new Error('Not your turn');
-    return;
+    throw new Error('Not your turn');
   }
   if (game.currentField !== -1 && game.currentField !== field) {
-    //throw new Error('Invalid move');
-    console.log(
-      'invalid move. current field:' +
-        game.currentField +
-        ':  targeted field:' +
-        field
-    );
-    return;
+    throw new Error('Invalid move');
   }
   if (game.board[field][square] !== 0) {
-    //throw new Error('Invalid move');
-    return;
+    throw new Error('Invalid move');
   }
 
   game.board[field][square] = playerId === game.players[0].id ? 1 : 2;
@@ -135,7 +126,7 @@ function move(gameId: string, playerId: string, field: number, square: number) {
     checkSingleField(game.board[square]) === FieldState.Empty ? square : -1;
   const outcome = checkWin(game.board);
 
-  game.currentPlayer = otherPlayer(game.players, playerId);
+  game.currentPlayer = otherPlayer(game.players, playerId).id;
   game.lastTurn = Date.now();
 
   game.players.forEach((player) => {
@@ -169,8 +160,8 @@ function move(gameId: string, playerId: string, field: number, square: number) {
   }
 }
 
-function otherPlayer(players: [Player, Player?], playerId: string) {
-  return players[0].id === playerId ? players[1].id : players[0].id;
+function otherPlayer(players: [Player, Player?], playerId: string): Player {
+  return players[0].id === playerId ? players[1] : players[0];
 }
 
 function checkWin(board: number[][]): FieldState {
@@ -202,24 +193,20 @@ function checkSingleField(field: FieldState[]): FieldState {
       return field[a];
     }
   }
-  console.log('ping');
   if (field.some((x) => x === FieldState.Empty)) {
     return FieldState.Empty;
   }
   return FieldState.Tied;
 }
 
-function disconnect(gameId: string) {
-  console.log('disconnect');
+function disconnect(gameId: string, playerId: string) {
   const game = gameMap.get(gameId);
   if (!game) {
-    //throw new Error('Game not found');
+    throw new Error('Game not found');
     return;
   }
 
-  game.players.forEach((player) => {
-    player.cb('opponentDisconnect', '');
-  });
+  otherPlayer(game.players, playerId).cb('opponentDisconnect', 'disconnect');
 
   gameMap.delete(gameId);
 }

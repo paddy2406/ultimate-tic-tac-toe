@@ -1,9 +1,11 @@
 const vue = require('eslint-plugin-vue');
 const baseConfig = require('../../eslint.config.cjs');
+const prettier = require('eslint-config-prettier');
 
 module.exports = [
   ...baseConfig,
   ...vue.configs['flat/recommended'],
+  prettier,
   {
     files: ['**/*.vue'],
     languageOptions: {
