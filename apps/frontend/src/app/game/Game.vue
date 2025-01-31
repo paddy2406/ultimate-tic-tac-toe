@@ -1,17 +1,23 @@
 <script setup lang="ts">
 import Field from './Field.vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { useUserStore } from '../user-store';
 import { useGameStore } from './game-store';
-import { onMounted, ref, watch } from 'vue';
+import { onMounted, onUnmounted, ref, watch } from 'vue';
+import Modal from '../modal/Modal.vue';
 const route = useRoute();
 const userStore = useUserStore();
 const gameStore = useGameStore();
+const router = useRouter();
 
 const gameId = route.params.gameId as string; // Accessing the route parameter
 
 onMounted(() => {
   gameStore.joinGame(gameId, userStore.id);
+});
+
+onUnmounted(() => {
+  gameStore.reset();
 });
 
 const progress = ref(0);
@@ -37,55 +43,49 @@ watch(
 function move(field: number, square: number) {
   gameStore.makeMove(gameId, userStore.id, field, square);
 }
+
+function modalClosed() {
+  router.push({ name: 'Home' });
+}
 </script>
 
 <template>
-  <div class="page">
-    <div class="gameBody">
-      <div class="header">
-        <h1>-- Playing "{{ gameStore.opponent }}" --</h1>
-      </div>
+  <div class="header">
+    <h1>-- Playing "{{ gameStore.opponent }}" --</h1>
+  </div>
 
-      <div class="board">
-        <div v-for="(field, index) in gameStore.board" :key="index" class="row">
-          <Field
-            :field-data="field"
-            :field-index="index"
-            @makeMove="move"
-          />
-        </div>
-      </div>
-      <div class="progress-box">
-        <div v-if="gameStore.isOwnTurn">Your Turn</div>
-        <div v-else>{{ gameStore.opponent }}'s turn</div>
-        <div class="progress-bar">
-          <div
-            class="progress"
-            :style="{
-              width: progress + '%',
-              backgroundColor: gameStore.isOwnTurn ? 'green' : 'red',
-            }"
-          ></div>
-        </div>
-      </div>
+  <div class="board">
+    <div v-for="(field, index) in gameStore.board" :key="index" class="row">
+      <Field :field-data="field" :field-index="index" @makeMove="move" />
     </div>
   </div>
+  <div class="progress-box">
+    <div class="progress-bar">
+      <div
+        class="progress"
+        :style="{
+          width: progress + '%',
+          backgroundColor: gameStore.isOwnTurn ? 'green' : 'red',
+        }"
+      ></div>
+    </div>
+
+    {{ gameStore.isOwnTurn ? 'Your Turn' : gameStore.opponent + "'s turn" }}
+  </div>
+
+  <Modal :isVisible="gameStore.gameOverMessage !== ''" @close="modalClosed">
+    <div class="gameOverMessage">{{ gameStore.gameOverMessage }}</div></Modal
+  >
 </template>
 
 <style scoped>
+.gameOverMessage {
+  font-size: 13vmin;
+}
 .header {
-  display: flex;
-  justify-content: center;
   margin-bottom: 20px;
   font-size: 30px;
   font-weight: bold;
-}
-
-.page {
-  width: 100%;
-  height: 100vh;
-  display: flex;
-  justify-content: center;
 }
 
 .progress {
@@ -95,28 +95,23 @@ function move(field: number, square: number) {
 
 .progress-bar {
   margin-top: 20px;
-  width: 80%;
+  width: 100%;
   height: 2vh;
   background-color: lightgray;
 }
 
 .progress-box {
-  padding: 20px;
+  width: 80%;
+  padding: 1vmin;
   display: flex;
   align-items: center;
-  font-size: 24px;
   font-weight: bold;
   flex-direction: column;
 }
 
-.gameBody {
-  width: 100%;
-  max-width: 80vh;
-  padding: 20px;
-}
-
 .board {
   display: grid;
+  min-width: 100%;
   grid-template-rows: repeat(3, 1fr);
   grid-template-columns: repeat(3, 1fr);
   gap: 5px;
@@ -124,5 +119,9 @@ function move(field: number, square: number) {
 }
 .row {
   display: contents;
+}
+
+h1 {
+  font-size: 5vmin;
 }
 </style>

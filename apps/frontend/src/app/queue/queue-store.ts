@@ -42,7 +42,7 @@ export const useQueueStore = defineStore('queuestore', {
     },
     async leaveQueue() {
       eventSource?.close();
-      this.playersInQueue = [];
+      this.$reset();
     },
   },
 });

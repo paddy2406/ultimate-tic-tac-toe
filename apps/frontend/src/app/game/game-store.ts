@@ -27,6 +27,7 @@ export const useGameStore = defineStore('gameStore', {
     turnDuration: 0,
     currentField: -1,
     won: undefined as boolean | undefined,
+    gameOverMessage: '',
   }),
   actions: {
     async joinGame(gameId: string, playerId: string) {
@@ -55,13 +56,23 @@ export const useGameStore = defineStore('gameStore', {
         const res = JSON.parse(event.data);
         this.isOwnTurn = res.turn === playerId;
         this.turnDuration = res.turnDuration;
-        this.currentField = res.field;
+        this.currentField = res.nextField;
       });
 
       eventSource.addEventListener('matchOver', (event) => {
         const res = JSON.parse(event.data);
         this.won = res.winner === playerId;
-        //eventSource?.close();
+        this.gameOverMessage =
+          res.winner === playerId
+            ? 'YOU WIN!'
+            : res.winner === 'none'
+            ? 'TIE!'
+            : 'YOU LOSE!';
+        eventSource?.close();
+      });
+
+      eventSource.addEventListener('opponentDisconnect', () => {
+        this.gameOverMessage = 'your oppenent disconnected, YOU WIN';
       });
     },
     async makeMove(
@@ -74,6 +85,10 @@ export const useGameStore = defineStore('gameStore', {
         field,
         square,
       });
+    },
+    reset() {
+      eventSource?.close();
+      this.$reset();
     },
   },
 });

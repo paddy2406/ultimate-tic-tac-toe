@@ -50,7 +50,7 @@ const backgroundcolor = computed(() => {
   ) {
     return gameStore.isOwnTurn ? 'lightgreen' : 'lightcoral';
   }
-  return 'lightblue';
+  return '#EFF6FB';
 });
 </script>
 
@@ -80,16 +80,16 @@ const backgroundcolor = computed(() => {
         />
       </div>
     </div>
-    <div v-else-if="winner === 'X'" class="cell">
+    <div v-else-if="winner === 'X'" class="cell completed">
       <FontAwesomeIcon :icon="faX" style="line-height: 1; font-size: 24px" />
     </div>
-    <div v-else-if="winner === 'O'" class="cell">
+    <div v-else-if="winner === 'O'" class="cell completed">
       <FontAwesomeIcon
         :icon="faCircle"
         style="line-height: 1; font-size: 24px"
       />
     </div>
-    <div v-else class="cell">{{ 'peter' }}</div>
+    <div v-else class="cell completed"></div>
   </div>
 </template>
 
@@ -115,5 +115,14 @@ svg {
   justify-content: center;
   cursor: pointer;
   aspect-ratio: 1 / 1;
+  background-color: #eff6fb;
+}
+.completed {
+  pointer-events: none;
+  filter: brightness(80%);
+}
+
+.cell:hover {
+  filter: brightness(80%);
 }
 </style>

@@ -13,14 +13,14 @@ const queueMap = new Map<string, QueueMember>();
  */
 setInterval(() => {
   for (const [key, value] of queueMap) {
-    if (Date.now() - value.inQueueSince > 100000) {
+    if (Date.now() - value.inQueueSince > 30_000) {
       value.cb('timeout', '');
       queueMap.delete(key);
     }
   }
   const playeralligableForMatch = Array.from(queueMap.entries()).filter(
     ([_, value]) => {
-      return Date.now() - value.inQueueSince > 5000;
+      return Date.now() - value.inQueueSince > 5_000;
     }
   ); // only match players that have been in the queue for more than 5 seconds to simulate waiting period
 

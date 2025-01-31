@@ -1,9 +1,12 @@
 <template>
-  <div class="home-container">
+  <div class="page">
     <div v-if="!userStore.isLoggedIn">
-      <h1>Welcome to Ultimate Tic-Tac-Toe</h1>
-      <div class="input-container">
-        <label for="playerName">Enter your name:</label>
+      <div class="input-container box">
+        <h1>
+          ULTIMATE <br />
+          TIC-TAC-TOE
+        </h1>
+        <label for="playerName">Enter Username:</label>
         <input
           id="playerName"
           v-model="playerNameInput"
@@ -15,15 +18,15 @@
         :disabled="playerNameInput.trim() === ''"
         @click="userStore.register(playerNameInput)"
       >
-        Register
+        REGISTER
       </button>
     </div>
 
-    <div v-else>
-      <h1>Hello {{ userStore.name }}</h1>
-      <label> Press button to join matchmaking queue</label>
+    <div v-else class="box">
+      <h1>HELLO {{ userStore.name }}</h1>
+      <label> join matchmaking queue</label>
       <button>
-        <RouterLink to="/queue">Go!</RouterLink>
+        <RouterLink to="/queue">GO!</RouterLink>
       </button>
     </div>
   </div>
@@ -36,22 +39,34 @@ const userStore = useUserStore();
 
 const playerNameInput = ref('');
 
+const isModalOpen = ref(false);
+
 onMounted(() => {
   const storedPlayerId = localStorage.getItem('playerId');
   if (storedPlayerId) {
     userStore.login(storedPlayerId);
   }
+  setTimeout(() => {
+    isModalOpen.value = true;
+  }, 3000);
 });
+
+function modalClosed() {
+  console.log('closed');
+  isModalOpen.value = false;
+}
 </script>
 
 <style scoped>
-.home-container {
+.page {
+  text-align: center;
+}
+.box {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 100vh;
-  background-color: #f0f0f0;
+  gap: 2vmin;
 }
 
 h1 {
@@ -64,10 +79,19 @@ h1 {
 
 label {
   margin-right: 10px;
+  font-size: smaller;
 }
 
-input {
-  padding: 5px;
-  font-size: 16px;
+input[type='text'],
+textarea {
+  padding: 1vmin;
+  background-color: #eff6fb;
+  border-radius: 2vmin;
+  color: #454545;
+}
+
+h1 {
+  margin-bottom: 10vmin;
+  font-size: 8vmin;
 }
 </style>

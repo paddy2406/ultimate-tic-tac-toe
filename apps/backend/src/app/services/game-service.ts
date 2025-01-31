@@ -1,4 +1,6 @@
-const TURN_DURATION = 20_000;
+import { UserService } from './user-service';
+
+const TURN_DURATION = 2_000;
 
 enum FieldState {
   Empty,
@@ -68,7 +70,8 @@ function joinGame(
     player.cb(
       'gameStarted',
       JSON.stringify({
-        opponent: player.id === game.players[0].id ? 'player2' : 'player1', // TODO: get the actual name of the player
+        opponent: UserService.getUser(otherPlayer(game.players, player.id))
+          .name,
         turn: game.players[0].id,
         turnDuration: TURN_DURATION,
       })
@@ -132,21 +135,6 @@ function move(gameId: string, playerId: string, field: number, square: number) {
     checkSingleField(game.board[square]) === FieldState.Empty ? square : -1;
   const outcome = checkWin(game.board);
 
-  if (outcome !== FieldState.Empty) {
-    console.log('peter');
-    game.players.forEach((player) => {
-      player.cb(
-        'matchOver',
-        JSON.stringify({
-          winner:
-            outcome === FieldState.Tied ? 'none' : game.players[outcome - 1].id,
-        })
-      );
-    });
-    gameMap.delete(gameId);
-    return;
-  }
-
   game.currentPlayer = otherPlayer(game.players, playerId);
   game.lastTurn = Date.now();
 
@@ -162,6 +150,23 @@ function move(gameId: string, playerId: string, field: number, square: number) {
       })
     );
   });
+
+  if (outcome !== FieldState.Empty) {
+    setTimeout(() => {
+      game.players.forEach((player) => {
+        player.cb(
+          'matchOver',
+          JSON.stringify({
+            winner:
+              outcome === FieldState.Tied
+                ? 'none'
+                : game.players[outcome - 1].id,
+          })
+        );
+      });
+      gameMap.delete(gameId);
+    }, 2000);
+  }
 }
 
 function otherPlayer(players: [Player, Player?], playerId: string) {
@@ -204,7 +209,7 @@ function checkSingleField(field: FieldState[]): FieldState {
   return FieldState.Tied;
 }
 
-function disconnect(gameId: string, playerId: string) {
+function disconnect(gameId: string) {
   console.log('disconnect');
   const game = gameMap.get(gameId);
   if (!game) {
@@ -212,15 +217,8 @@ function disconnect(gameId: string, playerId: string) {
     return;
   }
 
-  const otherPlayerId = otherPlayer(game.players, playerId);
-
   game.players.forEach((player) => {
-    player.cb(
-      'matchOver',
-      JSON.stringify({
-        winner: otherPlayerId,
-      })
-    );
+    player.cb('opponentDisconnect', '');
   });
 
   gameMap.delete(gameId);
