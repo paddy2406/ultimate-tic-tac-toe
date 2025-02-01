@@ -1,5 +1,5 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
-import { QueueService } from '../services/queue-service';
+import { QueueCallback, QueueService } from '../services/queue-service';
 
 export default async function (fastify: FastifyInstance) {
   fastify.get(
@@ -9,8 +9,8 @@ export default async function (fastify: FastifyInstance) {
       reply: FastifyReply
     ) {
       reply.sse({ event: 'connected' });
-      const newDataCallback = (event: string, data: string) => {
-        reply.sse({ event, data });
+      const newDataCallback: QueueCallback = (event, data) => {
+        reply.sse({ event, data: JSON.stringify(data) });
       };
 
       QueueService.joinQueue(

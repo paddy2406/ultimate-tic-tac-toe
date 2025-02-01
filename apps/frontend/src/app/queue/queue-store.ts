@@ -1,3 +1,8 @@
+import {
+  addPlayer,
+  deletePlayer,
+  matchFound,
+} from '@ultimate-tic-tac-toe/types';
 import { defineStore } from 'pinia';
 
 interface Player {
@@ -15,30 +20,25 @@ export const useQueueStore = defineStore('queuestore', {
   }),
   actions: {
     async joinQueue(id: string, name: string) {
-      eventSource = new EventSource(`/api/queue?id=${id}&name=${name}`);
+      eventSource = new EventSource(`/queue?id=${id}&name=${name}`);
 
       eventSource.addEventListener('addPlayer', (event) => {
-        if (
-          !this.playersInQueue.some((x) => x.id === JSON.parse(event.data).id)
-        ) {
-          this.playersInQueue.push(JSON.parse(event.data));
-          console.log('add', event.data);
+        const res = JSON.parse(event.data) as addPlayer;
+        if (!this.playersInQueue.some((x) => x.id === res.id)) {
+          this.playersInQueue.push(res);
         }
       });
 
       eventSource.addEventListener('deletePlayer', (event) => {
-        const id = JSON.parse(event.data).id;
-        const index = this.playersInQueue.findIndex((x) => x.id === id);
+        const res = JSON.parse(event.data) as deletePlayer;
+        const index = this.playersInQueue.findIndex((x) => x.id === res.id);
         this.playersInQueue.splice(index, 1);
-        console.log(this.playersInQueue);
-        console.log('remove', event.data);
       });
 
       eventSource.addEventListener('matchFound', (event) => {
-        const res = JSON.parse(event.data);
+        const res = JSON.parse(event.data) as matchFound;
         this.matchId = res.id;
         this.oppenent = res.opponent;
-        console.log('match found', event.data);
         eventSource?.close();
       });
     },

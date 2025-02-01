@@ -1,5 +1,12 @@
 import { defineStore } from 'pinia';
 import axios from 'axios';
+import {
+  gameStarted,
+  makeMove,
+  matchOver,
+  move,
+  turnTimeout,
+} from '@ultimate-tic-tac-toe/types';
 
 enum FieldState {
   Empty,
@@ -32,18 +39,18 @@ export const useGameStore = defineStore('gameStore', {
   actions: {
     async joinGame(gameId: string, playerId: string) {
       eventSource = new EventSource(
-        `/api/game?gameId=${gameId}&playerId=${playerId}`
+        `/game?gameId=${gameId}&playerId=${playerId}`
       );
 
       eventSource.addEventListener('gameStarted', (event) => {
-        const res = JSON.parse(event.data);
+        const res = JSON.parse(event.data) as gameStarted;
         this.opponent = res.opponent;
         this.isOwnTurn = res.turn === playerId;
         this.turnDuration = res.turnDuration;
       });
 
       eventSource.addEventListener('move', (event) => {
-        const res = JSON.parse(event.data);
+        const res = JSON.parse(event.data) as move;
         this.isOwnTurn = res.turn === playerId;
         this.currentField = res.currentField;
         this.turnDuration = res.turnDuration;
@@ -52,14 +59,14 @@ export const useGameStore = defineStore('gameStore', {
       });
 
       eventSource.addEventListener('turnTimeout', (event) => {
-        const res = JSON.parse(event.data);
+        const res = JSON.parse(event.data) as turnTimeout;
         this.isOwnTurn = res.turn === playerId;
         this.turnDuration = res.turnDuration;
         this.currentField = res.nextField;
       });
 
       eventSource.addEventListener('matchOver', (event) => {
-        const res = JSON.parse(event.data);
+        const res = JSON.parse(event.data) as matchOver;
         this.won = res.winner === playerId;
         this.gameOverMessage =
           res.winner === playerId
@@ -81,10 +88,13 @@ export const useGameStore = defineStore('gameStore', {
       field: number,
       square: number
     ) {
-      await axios.post(`/api/game/move?gameId=${gameId}&playerId=${playerId}`, {
-        field,
-        square,
-      });
+      await axios.post<undefined, undefined, makeMove>(
+        `/game/move?gameId=${gameId}&playerId=${playerId}`,
+        {
+          field,
+          square,
+        }
+      );
     },
     reset() {
       eventSource?.close();

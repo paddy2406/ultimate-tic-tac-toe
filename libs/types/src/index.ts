@@ -1,3 +1,4 @@
 export * from './lib/register';
 export * from './lib/login';
-export * from './lib/move';
+export * from './lib/game';
+export * from './lib/queue';

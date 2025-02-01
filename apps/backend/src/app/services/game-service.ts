@@ -1,6 +1,24 @@
+import {
+  gameStarted,
+  turnTimeout,
+  move,
+  matchOver,
+  opponentDisconnect,
+} from '@ultimate-tic-tac-toe/types';
+import { SSECallback } from '../types/sseCallback';
 import { UserService } from './user-service';
 
-const TURN_DURATION = 2_000;
+export type gameCallbacks = {
+  turnTimeout: turnTimeout;
+  gameStarted: gameStarted;
+  move: move;
+  matchOver: matchOver;
+  opponentDisconnect: opponentDisconnect;
+};
+
+export type GameCallback = SSECallback<gameCallbacks>;
+
+const TURN_DURATION = 20_000;
 
 enum FieldState {
   Empty,
@@ -11,7 +29,7 @@ enum FieldState {
 
 type Player = {
   id: string;
-  cb: (event: string, data: string) => void;
+  cb: GameCallback;
 };
 
 type Game = {
@@ -26,19 +44,19 @@ const gameMap = new Map<string, Game>();
 
 setInterval(() => {
   for (const game of gameMap.values()) {
-    if (Date.now() - game.lastTurn > TURN_DURATION) {
+    if (
+      Date.now() - game.lastTurn > TURN_DURATION &&
+      game.players[1] !== undefined
+    ) {
       game.currentField = -1;
       game.currentPlayer = otherPlayer(game.players, game.currentPlayer).id;
       game.lastTurn = Date.now();
       game.players.forEach((player) => {
-        player.cb(
-          'turnTimeout',
-          JSON.stringify({
-            turn: game.currentPlayer,
-            turnDuration: TURN_DURATION,
-            nextField: game.currentField,
-          })
-        );
+        player.cb('turnTimeout', {
+          turn: game.currentPlayer,
+          turnDuration: TURN_DURATION,
+          nextField: game.currentField,
+        });
       });
     }
   }
@@ -47,7 +65,7 @@ setInterval(() => {
 function joinGame(
   gameId: string,
   playerId: string,
-  newDataCallback: (event: string, data: string) => void
+  newDataCallback: GameCallback
 ) {
   if (!gameMap.has(gameId)) {
     initGame(gameId, playerId, newDataCallback);
@@ -67,22 +85,19 @@ function joinGame(
   game.lastTurn = Date.now();
 
   game.players.forEach((player) => {
-    player.cb(
-      'gameStarted',
-      JSON.stringify({
-        opponent: UserService.getUser(otherPlayer(game.players, player.id).id)
-          .name,
-        turn: game.players[0].id,
-        turnDuration: TURN_DURATION,
-      })
-    );
+    player.cb('gameStarted', {
+      opponent: UserService.getUser(otherPlayer(game.players, player.id).id)
+        .name,
+      turn: game.players[0].id,
+      turnDuration: TURN_DURATION,
+    });
   });
 }
 
 function initGame(
   gameId: string,
   playerId: string,
-  newDataCallback: (event: string, data: string) => void
+  newDataCallback: GameCallback
 ) {
   gameMap.set(gameId, {
     players: [
@@ -130,30 +145,22 @@ function move(gameId: string, playerId: string, field: number, square: number) {
   game.lastTurn = Date.now();
 
   game.players.forEach((player) => {
-    player.cb(
-      'move',
-      JSON.stringify({
-        field,
-        square,
-        currentField: game.currentField,
-        turn: game.currentPlayer,
-        turnDuration: TURN_DURATION,
-      })
-    );
+    player.cb('move', {
+      field,
+      square,
+      currentField: game.currentField,
+      turn: game.currentPlayer,
+      turnDuration: TURN_DURATION,
+    });
   });
 
   if (outcome !== FieldState.Empty) {
     setTimeout(() => {
       game.players.forEach((player) => {
-        player.cb(
-          'matchOver',
-          JSON.stringify({
-            winner:
-              outcome === FieldState.Tied
-                ? 'none'
-                : game.players[outcome - 1].id,
-          })
-        );
+        player.cb('matchOver', {
+          winner:
+            outcome === FieldState.Tied ? 'none' : game.players[outcome - 1].id,
+        });
       });
       gameMap.delete(gameId);
     }, 2000);
@@ -201,14 +208,13 @@ function checkSingleField(field: FieldState[]): FieldState {
 
 function disconnect(gameId: string, playerId: string) {
   const game = gameMap.get(gameId);
-  if (!game) {
-    throw new Error('Game not found');
-    return;
+  if (game) {
+    otherPlayer(game.players, playerId).cb('opponentDisconnect', {
+      id: playerId,
+    });
+
+    gameMap.delete(gameId);
   }
-
-  otherPlayer(game.players, playerId).cb('opponentDisconnect', 'disconnect');
-
-  gameMap.delete(gameId);
 }
 
 export const GameService = { joinGame, disconnect, move };

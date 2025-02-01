@@ -24,20 +24,22 @@ export const useUserStore = defineStore('userstore', {
   },
   actions: {
     async login(id: string) {
-      const response = await axios.post<login, AxiosResponse<loginResponse>>(
-        '/api/login',
-        {
-          id,
-        }
-      );
+      const response = await axios.post<
+        loginResponse,
+        AxiosResponse<loginResponse>,
+        login
+      >('/login', {
+        id,
+      });
       this.id = response.data.id;
       this.name = response.data.name;
     },
     async register(name: string) {
       const response = await axios.post<
-        register,
-        AxiosResponse<registerResponse>
-      >('/api/register', {
+        registerResponse,
+        AxiosResponse<registerResponse>,
+        register
+      >('/register', {
         name,
       });
 

@@ -1,5 +1,5 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
-import { GameService } from '../services/game-service';
+import { GameCallback, GameService } from '../services/game-service';
 import { moveSchema, move } from '@ultimate-tic-tac-toe/types';
 
 export default async function (fastify: FastifyInstance) {
@@ -12,8 +12,8 @@ export default async function (fastify: FastifyInstance) {
       reply: FastifyReply
     ) {
       reply.sse({ event: 'connected' });
-      const newDataCallback = (event: string, data: string) => {
-        reply.sse({ event, data });
+      const newDataCallback: GameCallback = (event, data) => {
+        reply.sse({ event, data: JSON.stringify(data) });
       };
 
       GameService.joinGame(
