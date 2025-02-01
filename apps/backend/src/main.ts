@@ -5,7 +5,7 @@ import fastifyStatic from '@fastify/static';
 import path from 'node:path';
 
 const host = process.env.HOST ?? 'localhost';
-const port = process.env.PORT ? Number(process.env.PORT) : 8080;
+const port = process.env.PORT ? Number(process.env.PORT) : 3000;
 
 // Instantiate Fastify with some config
 const server = Fastify({

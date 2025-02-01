@@ -10,3 +10,16 @@
 
 - **Frontend:** Entwickelt mit Vue.js
 - **Backend:** Implementiert in Node.js unter Verwendung von Fastify
+
+### Docker
+
+```sh
+docker build -t uttt .
+docker run -p 80:8080 -e HOST=0.0.0.0 -e PORT=8080 uttt
+```
+
+### Lokale Entwicklung
+
+```sh
+npm start
+```
