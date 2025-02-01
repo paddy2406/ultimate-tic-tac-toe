@@ -1,3 +1,11 @@
+# Ultimate Tic Tac Toe
+
+Ein Multiplayer [Ultimate Tic Tac Toe](https://en.wikipedia.org/wiki/Ultimate_tic-tac-toe) Spiel,
+entwickelt in Vue.js und einem Node.js-Backend. Das Spiel nutzt Server-Sent Events (SSE) für
+Echtzeitkommunikation und ist als Docker-Container verpackt und auf Render deployed ([Link](https://ultimate-tic-tac-toe-sgft.onrender.com/)).
+
+![game](game-image.png)
+
 ### Anforderungen
 
 - Spieler registrieren sich mit einem Nutzernamen (keine Passwörter oder Sicherheitsüberprüfungen erforderlich).
@@ -9,7 +17,7 @@
 ### Technische Anforderungen
 
 - **Frontend:** Entwickelt mit Vue.js
-- **Backend:** Implementiert in Node.js unter Verwendung von Fastify
+- **Backend:** Entwickelt mit Node.js und Fastify
 
 ### Docker
 
@@ -21,5 +29,6 @@ docker run -p 80:8080 -e HOST=0.0.0.0 -e PORT=8080 uttt
 ### Lokale Entwicklung
 
 ```sh
+npm i
 npm start
 ```
